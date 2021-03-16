@@ -1,7 +1,7 @@
 {
     "name": "kiwfy/request-service-php",
     "description": "PHP library using Guzzle base to send request to any services. Good to use in microservice architecture",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "type": "library",
     "license": "GPL-3.0-only",
     "require": {
