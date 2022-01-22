@@ -10,7 +10,9 @@ PHP library using Guzzle base to send request to any services. Good to use in mi
 
 ### Installation
 
-Requires [PHP](https://php.net) 7.1
+[Release 2.0.0](https://github.com/kiwfy/request-service-php/releases/tag/2.0.0) Requires [PHP](https://php.net) 8.1
+
+[Release 1.1.0](https://github.com/kiwfy/request-service-php/releases/tag/1.1.0) or earlier Requires [PHP](https://php.net) 7.1
 
 The recommended way to install is through [Composer](https://getcomposer.org/).
 
