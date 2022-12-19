@@ -644,12 +644,7 @@ class RequestTest extends TestCase
             'error_code' => 400,
         ];
 
-        $requestMock = Mockery::mock(
-            Request::class,
-            [
-                $config
-            ]
-        )->makePartial();
+        $requestMock = new Request($config);
 
         $errorPayload = $requestMock->getErrorMessage(
             400,
@@ -675,12 +670,7 @@ class RequestTest extends TestCase
             'error_code' => 500,
         ];
 
-        $requestMock = Mockery::mock(
-            Request::class,
-            [
-                $config
-            ]
-        )->makePartial();
+        $requestMock = new Request($config);
 
         $errorPayload = $requestMock->getErrorMessage(
             0,
