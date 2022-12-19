@@ -4,6 +4,7 @@ namespace RequestService;
 
 use Exception;
 use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Exception\ClientException;
 
 class Request extends BaseRequest
 {
@@ -63,17 +64,37 @@ class Request extends BaseRequest
             }
 
             return $response->getBody();
+        } catch (ClientException $e) {
+            return $this->getErrorMessage(
+                $e->getCode(),
+                $e->getResponse()->getBody()->getContents()
+            );
         } catch (Exception $e) {
-            $code = $e->getCode() ?? 500;
-            if (!$code) {
-                $code = 500;
-            }
-
-            return [
-                'message' => $e->getMessage() ?? 'Request error',
-                'error_code' => $code,
-            ];
+            return $this->getErrorMessage(
+                $e->getCode(),
+                $e->getMessage()
+            );
         }
+    }
+
+    /**
+     * create error response payload
+     * @param string $code
+     * @param string $message
+     * @return array
+     */
+    public function getErrorMessage(
+        int $code,
+        string $message
+    ): array {
+        if (!$code) {
+            $code = 500;
+        }
+
+        return [
+            'message' => $message ?? 'Request error',
+            'error_code' => $code,
+        ];
     }
 
     /**
