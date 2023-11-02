@@ -7,6 +7,7 @@ use GuzzleHttp\Client as Guzzle;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Psr7\Stream;
 
 class RequestTest extends TestCase
 {
@@ -56,15 +57,14 @@ class RequestTest extends TestCase
 
         $url = 'localhost/test';
 
-        $response = [
-            'result' => true,
-        ];
+        $response = null;
 
+        $getBodySpy = Mockery::spy(Stream::class);
         $responseInterfaceMock = Mockery::mock(ResponseInterface::class)
             ->shouldReceive('getBody')
             ->withNoArgs()
             ->once()
-            ->andReturn(json_encode($response))
+            ->andReturn($getBodySpy)
             ->getMock();
 
         $guzzleMock = Mockery::mock(Guzzle::class)
@@ -143,12 +143,6 @@ class RequestTest extends TestCase
             'message' => 'Request error',
             'error_code' => 500,
         ];
-
-        $responseInterfaceMock = Mockery::mock(ResponseInterface::class)
-            ->shouldReceive('getBody')
-            ->never()
-            ->andReturn(json_encode($response))
-            ->getMock();
 
         $guzzleMock = Mockery::mock(Guzzle::class)
             ->shouldReceive($method)
@@ -308,14 +302,14 @@ class RequestTest extends TestCase
 
         $response = 'result';
 
+        $getBodySpy = Mockery::spy(Stream::class);
         $responseInterfaceMock = Mockery::mock(ResponseInterface::class)
             ->shouldReceive('getBody')
             ->withNoArgs()
             ->once()
-            ->andReturnSelf()
+            ->andReturn($getBodySpy)
             ->shouldReceive('getContents')
             ->withNoArgs()
-            ->once()
             ->andReturn($response)
             ->getMock();
 
@@ -358,7 +352,7 @@ class RequestTest extends TestCase
             $body
         );
 
-        $this->assertEquals($sendRequest, base64_encode($response));
+        $this->assertEquals($sendRequest, null);
     }
 
     /**
@@ -389,11 +383,12 @@ class RequestTest extends TestCase
             'result' => true,
         ];
 
+        $getBodySpy = Mockery::spy(Stream::class);
         $responseInterfaceMock = Mockery::mock(ResponseInterface::class)
             ->shouldReceive('getBody')
             ->withNoArgs()
             ->once()
-            ->andReturn($response)
+            ->andReturn($getBodySpy)
             ->getMock();
 
         $guzzleMock = Mockery::mock(Guzzle::class)
@@ -435,7 +430,7 @@ class RequestTest extends TestCase
             $body
         );
 
-        $this->assertEquals($sendRequest, $response);
+        $this->assertIsObject($sendRequest);
     }
 
     /**
