@@ -6,7 +6,7 @@
 [![Downloads Old](https://img.shields.io/packagist/dt/kiwfy/request-service-php?logo=old&label=downloads%20legacy)](https://packagist.org/packages/kiwfy/request-service-php)
 [![Downloads](https://img.shields.io/packagist/dt/not-empty/request-service-php-lib?logo=old&label=downloads)](https://packagist.org/packages/not-empty/request-service-php-lib)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![Packagist License (custom server)](https://img.shields.io/packagist/l/not-empty/request-service-php-lib)](https://github.com/not-empty/request-service-php-lib/blob/master/LICENSE)
+[![Packagist License (custom server)](https://img.shields.io/packagist/l/not-empty/request-service-php-lib?v2)](https://github.com/not-empty/request-service-php-lib/blob/master/LICENSE)
 
 PHP library using Guzzle base to send request to any services. Good to use in microservice architecture
 
