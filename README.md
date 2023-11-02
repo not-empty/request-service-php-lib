@@ -6,6 +6,8 @@ PHP library using Guzzle base to send request to any services. Good to use in mi
 
 ### Installation
 
+[Release 5.0.0](https://github.com/not-empty/request-service-php-lib/releases/tag/5.0.0) Requires [PHP](https://php.net) 8.1
+
 [Release 4.0.0](https://github.com/not-empty/request-service-php-lib/releases/tag/4.0.0) Requires [PHP](https://php.net) 7.4
 
 [Release 3.0.0](https://github.com/not-empty/request-service-php-lib/releases/tag/3.0.0) Requires [PHP](https://php.net) 7.3
@@ -66,12 +68,12 @@ var_dump($response);
 if you want an environment to run or test it, you can build and install dependences like this
 
 ```sh
-docker build --build-arg PHP_VERSION=7.4.33-cli -t not-empty/request-service-php-lib:php74 -f contrib/Dockerfile .
+docker build --build-arg PHP_VERSION=8.1.4-cli -t not-empty/request-service-php-lib:php81 -f contrib/Dockerfile .
 ```
 
 Access the container
 ```sh
-docker run -v ${PWD}/:/var/www/html -it not-empty/request-service-php-lib:php74 bash
+docker run -v ${PWD}/:/var/www/html -it not-empty/request-service-php-lib:php81 bash
 ```
 
 Verify if all dependencies is installed
@@ -98,12 +100,12 @@ To ensure that the entire project is fine:
 First you need to building a correct environment to install all dependences
 
 ```sh
-docker build --build-arg PHP_VERSION=7.4.33-cli -t not-empty/request-service-php-lib:php74 -f contrib/Dockerfile .
+docker build --build-arg PHP_VERSION=8.1.4-cli -t not-empty/request-service-php-lib:php81 -f contrib/Dockerfile .
 ```
 
 Access the container
 ```sh
-docker run -v ${PWD}/:/var/www/html -it not-empty/request-service-php-lib:php74 bash
+docker run -v ${PWD}/:/var/www/html -it not-empty/request-service-php-lib:php81 bash
 ```
 
 Install all dependences
