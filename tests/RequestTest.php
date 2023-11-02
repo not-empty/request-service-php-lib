@@ -4,10 +4,12 @@ namespace RequestService;
 
 use Exception;
 use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Exception\ClientException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Psr7\Stream;
+use Psr\Http\Message\StreamInterface;
 
 class RequestTest extends TestCase
 {
@@ -57,9 +59,11 @@ class RequestTest extends TestCase
 
         $url = 'localhost/test';
 
-        $response = null;
+        $response = [
+            'result' => true,
+        ];
 
-        $getBodySpy = Mockery::spy(Stream::class);
+        $getBodySpy = Mockery::spy(StreamInterface::class);
         $responseInterfaceMock = Mockery::mock(ResponseInterface::class)
             ->shouldReceive('getBody')
             ->withNoArgs()
@@ -106,7 +110,7 @@ class RequestTest extends TestCase
             $body
         );
 
-        $this->assertEquals($sendRequest, $response);
+        $this->assertEquals($sendRequest, null);
     }
 
     /**
@@ -143,6 +147,12 @@ class RequestTest extends TestCase
             'message' => 'Request error',
             'error_code' => 500,
         ];
+
+        $responseInterfaceMock = Mockery::mock(ResponseInterface::class)
+            ->shouldReceive('getBody')
+            ->never()
+            ->andReturn(json_encode($response))
+            ->getMock();
 
         $guzzleMock = Mockery::mock(Guzzle::class)
             ->shouldReceive($method)
@@ -184,6 +194,113 @@ class RequestTest extends TestCase
         );
 
         $this->assertEquals($sendRequest, $response);
+    }
+
+    /**
+     * @covers \RequestService\Request::sendRequest
+     */
+    public function testClientException()
+    {
+        $service = 'back';
+        $method = 'GET';
+        $uri = '/test';
+        $header = [];
+        $body = [];
+
+        $headers = [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ]
+        ];
+
+        $bodyResult = [
+            'json' => $body
+        ];
+
+        $config = [
+            $service => [
+                'url' => 'localhost',
+            ],
+        ];
+
+        $url = 'localhost/test';
+
+        $response = [
+            'message' => 'Request error',
+            'error_code' => 400,
+        ];
+
+        $result = [
+            'message' => '',
+            'error_code' => 400
+        ];
+        $getBodySpy = Mockery::spy(StreamInterface::class);
+        $requestInterfaceMock = Mockery::mock(RequestInterface::class)
+            ->shouldReceive('getBody')
+            ->withNoArgs()
+            ->never()
+            ->andReturnSelf()
+            ->getMock();
+
+        $responseInterfaceMock = Mockery::mock(ResponseInterface::class)
+            ->shouldReceive('getStatusCode')
+            ->withNoArgs()
+            ->once()
+            ->andReturn(400)
+            ->shouldReceive('getBody')
+            ->withNoArgs()
+            ->once()
+            ->andReturn($getBodySpy)
+            ->shouldReceive('getContents')
+            ->withNoArgs()
+            ->andReturn(json_encode($response))
+            ->getMock();
+
+        $guzzleMock = Mockery::mock(Guzzle::class)
+            ->shouldReceive($method)
+            ->with($url, array_merge($headers, $bodyResult))
+            ->once()
+            ->andThrow(new ClientException(
+                'Request error',
+                $requestInterfaceMock,
+                $responseInterfaceMock
+            ))
+            ->getMock();
+
+        $requestMock = Mockery::mock(
+            Request::class,
+            [
+                $config
+            ]
+        )->makePartial();
+
+        $requestMock->shouldReceive('prepareHeader')
+            ->with($header)
+            ->once()
+            ->andReturn($headers)
+            ->shouldReceive('prepareBody')
+            ->with($body)
+            ->once()
+            ->andReturn($bodyResult)
+            ->shouldReceive('prepareUrl')
+            ->with($config[$service]['url'], $uri)
+            ->once()
+            ->andReturn($url)
+            ->shouldReceive('newGuzzle')
+            ->withNoArgs()
+            ->once()
+            ->andReturn($guzzleMock);
+
+        $sendRequest = $requestMock->sendRequest(
+            $service,
+            $method,
+            $uri,
+            $header,
+            $body
+        );
+
+        $this->assertEquals($sendRequest, $result);
     }
 
     /**
@@ -302,7 +419,7 @@ class RequestTest extends TestCase
 
         $response = 'result';
 
-        $getBodySpy = Mockery::spy(Stream::class);
+        $getBodySpy = Mockery::spy(StreamInterface::class);
         $responseInterfaceMock = Mockery::mock(ResponseInterface::class)
             ->shouldReceive('getBody')
             ->withNoArgs()
@@ -352,7 +469,7 @@ class RequestTest extends TestCase
             $body
         );
 
-        $this->assertEquals($sendRequest, null);
+        $this->assertEquals($sendRequest, '');
     }
 
     /**
@@ -383,7 +500,7 @@ class RequestTest extends TestCase
             'result' => true,
         ];
 
-        $getBodySpy = Mockery::spy(Stream::class);
+        $getBodySpy = Mockery::spy(StreamInterface::class);
         $responseInterfaceMock = Mockery::mock(ResponseInterface::class)
             ->shouldReceive('getBody')
             ->withNoArgs()
@@ -510,7 +627,59 @@ class RequestTest extends TestCase
             $body
         );
 
-        $this->assertEquals($sendRequest, $response);
+        $this->assertEquals($sendRequest, []);
+    }
+
+    /**
+     * @covers \RequestService\Request::getErrorMessage
+     */
+    public function testGetErrorMessage()
+    {
+        $config = [
+            'back' => [
+                'url' => 'localhost',
+            ],
+        ];
+
+        $result = [
+            'message' => 'Request error',
+            'error_code' => 400,
+        ];
+
+        $requestMock = new Request($config);
+
+        $errorPayload = $requestMock->getErrorMessage(
+            400,
+            'Request error'
+        );
+
+        $this->assertEquals($result, $errorPayload);
+    }
+
+     /**
+     * @covers \RequestService\Request::getErrorMessage
+     */
+    public function testGetErrorMessageWithNoCode()
+    {
+        $config = [
+            'back' => [
+                'url' => 'localhost',
+            ],
+        ];
+
+        $result = [
+            'message' => 'Request error',
+            'error_code' => 500,
+        ];
+
+        $requestMock = new Request($config);
+
+        $errorPayload = $requestMock->getErrorMessage(
+            0,
+            'Request error'
+        );
+
+        $this->assertEquals($result, $errorPayload);
     }
 
     protected function tearDown(): void
