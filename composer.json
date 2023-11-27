@@ -1,11 +1,11 @@
 {
     "name": "not-empty/request-service-php-lib",
     "description": "PHP library using Guzzle base to send request to any services. Good to use in microservice architecture",
-    "version": "6.0.0",
+    "version": "7.0.0",
     "type": "library",
     "license": "GPL-3.0-only",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "guzzlehttp/guzzle": "^7.8"
     },
     "authors": [
