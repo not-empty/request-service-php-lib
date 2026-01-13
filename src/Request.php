@@ -80,7 +80,7 @@ class Request extends BaseRequest
 
     /**
      * create error response payload
-     * @param string $code
+     * @param int $code
      * @param string $message
      * @return array
      */
@@ -93,7 +93,7 @@ class Request extends BaseRequest
         }
 
         return [
-            'message' => $message ?? 'Request error',
+            'message' => $message,
             'error_code' => $code,
         ];
     }
