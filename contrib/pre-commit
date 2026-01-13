@@ -1,6 +1,6 @@
 #!/bin/sh
 
-container=`docker ps --format "{{.Names}}" --filter "name=request-service-php-lib" | grep request-service-php-lib`
+container=`docker ps --format "{{.Names}}" --filter "name=request-response-json-php-lib" | grep request-response-json-php-lib`
 
 if [ -z $container ]
     then
